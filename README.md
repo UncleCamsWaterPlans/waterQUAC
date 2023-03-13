@@ -1,4 +1,4 @@
-# WQI
+# waterQUAC
 This package was devleoped as a way of sharing these data processing functions and tools within the team as first priority, 
 but secondly to facilitate data extraction to stakeholders and collaborators. 
 It includes data-out functions for the following resources:
