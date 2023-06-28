@@ -5,7 +5,7 @@ It includes data-extraction functions for the following resources:
 - [Water Monitoring Information Portal](https://water-monitoring.information.qld.gov.au/),
 - [Long Paddock - SILO](https://www.longpaddock.qld.gov.au/)
 - [OpenWeatherMap](https://openweathermap.org/api)
-- WQI's Eagle.IO instance. (*API keys may be granted upon request*)
+- Eagle.IO (*API keys may be granted upon request*)
 
 There is no intention for a CRAN release, however it can be installed using this function:
 ```
