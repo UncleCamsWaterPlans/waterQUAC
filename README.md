@@ -9,5 +9,5 @@ It includes data-out functions for the following resources:
 
 There is no intention for a CRAN release, however it can be installed using this function:
 ```
-devtools::install_github("https://github.com/UncleCamsWaterPlans/WQI")
+devtools::install_github("https://github.com/UncleCamsWaterPlans/waterQUAC")
 ```
