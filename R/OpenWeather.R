@@ -35,8 +35,10 @@
 #' @param APIKEY Given from the free tier account for OpenWeather
 #' @param time UNIX time for a given day. Free tier only supports the last 5 days
 #'
+#' @importFrom rlang .data
+#'
 #' @examples
-#' #dat <- OpenWeather(City = "Ayr", time = (as.integer(Sys.time())), APIKEY = "XYZ")
+#' dat <- OpenWeather(City = "Ayr", time = (as.integer(Sys.time())), APIKEY = "XYZ")
 #'
 #' @return data frame containing weather observation data from given city. Time as "Australia/Brisbane" (UTC+10)
 #'
@@ -58,6 +60,7 @@ API <- httr::GET(URL)
 content = jsonlite::fromJSON(rawToChar(API$content))
 content = content[["hourly"]]
 content$dt <- as.POSIXct(content$dt, origin = "1970-01-01", tz = "Australia/Brisbane")
+
 return(content)
 }
 

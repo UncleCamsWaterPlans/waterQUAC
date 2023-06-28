@@ -12,7 +12,7 @@
 #' @param END Date* to end the extraction period on. Format = "YYYYMMDD". Defaults to the system date plus one day.
 #'
 #' @examples
-#' #df_test <- WMIP_Extract("110001D", "20220801", "temperature")
+#' df_test <- WMIP_Extract("110001D", "20220801", "temperature")
 #'
 #'
 #' @return A data frame containing extracted WMIP data for specified gauging station/parameter.

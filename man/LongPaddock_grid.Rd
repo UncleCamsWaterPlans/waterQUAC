@@ -35,14 +35,11 @@ the latitude, longitude, start date, finish date, format, and username as input.
 function returns a tibble with the gridded data.
 }
 \examples{
-lat = "-18.50"
-long = "145.98"
-
 df <- LongPaddock_grid(lat = "-18.50",
                       long = "145.98",
                      start = format(Sys.time() - (700*86400), "\%Y\%m\%d"),
                      format = "alldata",
-                     username = "cameron.roberts@des.qld.gov.au")
+                     username = "example@email.com.au")
 
 }
 \seealso{

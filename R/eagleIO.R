@@ -69,17 +69,17 @@ EIO_Hist <- function(APIKEY, param, START, END = format(Sys.time() + 86400, "%Y-
 #' @param END DateTime to end the historic period of capture. Defaults to the current system time + one day. Format needs to be in ISO8601, see: 2014-10-09T22:38:10Z || 2014-10-09T22:38:10.000Z || 2014-10-09T20:38:10+0200 || 2014-10-09T20:38:10+02:00
 #'
 #' @examples
-#' loggerRef <- WQI::loggerRef
-#' site <- "1111019"
-#' dex <- loggerRef |>
-#'   dplyr::filter(GSnum == site)
+#' #loggerRef <- WQI::loggerRef
+#' #site <- "1111019"
+#' #dex <- loggerRef |>
+#' #  dplyr::filter(GSnum == site)
 #'
-#' NNO3 <- dex$`OPUSResults - OPUS1000 N NO3`
-#' TSSeq <- dex$`OPUSResults - OPUS1016 TSSeq`
-#' abs210 <- dex$`OPUSResults - OPUS1036 Abs210`
-#' abs254 <- dex$`OPUSResults - OPUS1042 Abs254`
-#' abs360 <- dex$`OPUSResults - OPUS1034 Abs360`
-#' SQI <- dex$`OPUSResults - OPUS1060 SQI`
+#' #NNO3 <- dex$`OPUSResults - OPUS1000 N NO3`
+#' #TSSeq <- dex$`OPUSResults - OPUS1016 TSSeq`
+#' #abs210 <- dex$`OPUSResults - OPUS1036 Abs210`
+#' #abs254 <- dex$`OPUSResults - OPUS1042 Abs254`
+#' #abs360 <- dex$`OPUSResults - OPUS1034 Abs360`
+#' #SQI <- dex$`OPUSResults - OPUS1060 SQI`
 #'
 #' @return tibble containing returned historic data for OPUS reportable parameters and associsated spectral values, value and quality. Time as "Australia/Brisbane"
 #'
@@ -164,17 +164,17 @@ OPUS_Hist <- function(APIKEY, NNO3, TSSeq, abs210, abs254, abs360, SQI, START, E
 #' @param END DateTime to end the historic period of capture. Defaults to the current system time + one day. Format needs to be in ISO8601, see: 2014-10-09T22:38:10Z || 2014-10-09T22:38:10.000Z || 2014-10-09T20:38:10+0200 || 2014-10-09T20:38:10+02:00
 #'
 #' @examples
-#' loggerRef <- WQI::loggerRef
-#' site <- "1350053"
-#' dex <- loggerRef |>
-#'   dplyr::filter(GSnum == site)
+#' #loggerRef <- WQI::loggerRef
+#' #site <- "1350053"
+#' #dex <- loggerRef |>
+#' #  dplyr::filter(GSnum == site)
 #'
-#' NNO3 <- dex$`OPUSResults - OPUS1000 N NO3`
-#' refA <- dex$`Nitrate - NICO RefA`
-#' refB <- dex$`Nitrate - NICO RefB`
-#' refC <- dex$`Nitrate - NICO RefC`
-#' refD <- dex$`Nitrate - NICO RefD`
-#' SQI <- dex$`OPUSResults - OPUS1060 SQI`
+#' #NNO3 <- dex$`OPUSResults - OPUS1000 N NO3`
+#' #refA <- dex$`Nitrate - NICO RefA`
+#' #refB <- dex$`Nitrate - NICO RefB`
+#' #refC <- dex$`Nitrate - NICO RefC`
+#' #refD <- dex$`Nitrate - NICO RefD`
+#' #SQI <- dex$`OPUSResults - OPUS1060 SQI`
 #'
 #' @return tibble containing returned historic data for OPUS reportable parameters and associsated spectral values, value and quality. Time as "Australia/Brisbane"
 #'

@@ -45,16 +45,16 @@ tibble containing returned historic data for OPUS reportable parameters and asso
 Function for extracting a tibble of historic OPUS data from WQI's eagle.IO instance.
 }
 \examples{
-loggerRef <- WQI::loggerRef
-site <- "1111019"
-dex <- loggerRef |>
-  dplyr::filter(GSnum == site)
+#loggerRef <- WQI::loggerRef
+#site <- "1111019"
+#dex <- loggerRef |>
+#  dplyr::filter(GSnum == site)
 
-NNO3 <- dex$`OPUSResults - OPUS1000 N NO3`
-TSSeq <- dex$`OPUSResults - OPUS1016 TSSeq`
-abs210 <- dex$`OPUSResults - OPUS1036 Abs210`
-abs254 <- dex$`OPUSResults - OPUS1042 Abs254`
-abs360 <- dex$`OPUSResults - OPUS1034 Abs360`
-SQI <- dex$`OPUSResults - OPUS1060 SQI`
+#NNO3 <- dex$`OPUSResults - OPUS1000 N NO3`
+#TSSeq <- dex$`OPUSResults - OPUS1016 TSSeq`
+#abs210 <- dex$`OPUSResults - OPUS1036 Abs210`
+#abs254 <- dex$`OPUSResults - OPUS1042 Abs254`
+#abs360 <- dex$`OPUSResults - OPUS1034 Abs360`
+#SQI <- dex$`OPUSResults - OPUS1060 SQI`
 
 }

@@ -45,16 +45,16 @@ tibble containing returned historic data for OPUS reportable parameters and asso
 Function for extracting a tibble of historic NICO data from WQI's eagle.IO instance.
 }
 \examples{
-loggerRef <- WQI::loggerRef
-site <- "1350053"
-dex <- loggerRef |>
-  dplyr::filter(GSnum == site)
+#loggerRef <- WQI::loggerRef
+#site <- "1350053"
+#dex <- loggerRef |>
+#  dplyr::filter(GSnum == site)
 
-NNO3 <- dex$`OPUSResults - OPUS1000 N NO3`
-refA <- dex$`Nitrate - NICO RefA`
-refB <- dex$`Nitrate - NICO RefB`
-refC <- dex$`Nitrate - NICO RefC`
-refD <- dex$`Nitrate - NICO RefD`
-SQI <- dex$`OPUSResults - OPUS1060 SQI`
+#NNO3 <- dex$`OPUSResults - OPUS1000 N NO3`
+#refA <- dex$`Nitrate - NICO RefA`
+#refB <- dex$`Nitrate - NICO RefB`
+#refC <- dex$`Nitrate - NICO RefC`
+#refD <- dex$`Nitrate - NICO RefD`
+#SQI <- dex$`OPUSResults - OPUS1060 SQI`
 
 }

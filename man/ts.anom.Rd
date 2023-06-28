@@ -39,24 +39,24 @@ detect spikes in the data.
 }
 \examples{
 
-#OVERWRITE <-
-#  c(155,
-#    101,
-#    105,
-#    2200,
-#    1020,
-#    2000,
-#    2010:2015,
-#    2210:2215,
-#    3061:3068,
-#    3211:3214) #overwritable QC codes, all else are retained
-#
-#
-#
-#tst <- ts.anom(df, OVERWRITE, 0, 650)
-#
-#tst |>
-#  plotly::plot_ly() |>
-#  plotly::add_markers(x=~ts, y=~Value, type = "scatter", color = ~Quality)
+OVERWRITE <-
+  c(155,
+    101,
+    105,
+    2200,
+    1020,
+    2000,
+    2010:2015,
+    2210:2215,
+    3061:3068,
+    3211:3214) #overwritable QC codes, all else are retained
+
+
+
+tst <- ts.anom(waterQUAC::TSS_data, OVERWRITE, 0, 650)
+
+tst |>
+  plotly::plot_ly() |>
+  plotly::add_markers(x=~ts, y=~Value, type = "scatter", color = ~Quality)
 
 }

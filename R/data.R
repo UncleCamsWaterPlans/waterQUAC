@@ -137,3 +137,12 @@
 #'   \item{Samples}{Samples}
 #'   }
 "reportableParamRef"
+
+#' An example time series dataset of TSS probe data.
+#' @format a data frame containing 66851 obs. of  3 variables
+#' \describe{
+#'   \item{ts}{ts}
+#'   \item{Value}{Value}
+#'   \item{Quality}{Quality}
+#'   }
+"TSS_data"

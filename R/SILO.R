@@ -15,7 +15,7 @@
 #' df <- LongPaddock_ppd(station = "32043",
 #'                      start = format(Sys.time() - (365*86400), "%Y%m%d"),
 #'                      format = "standard",
-#'                      username = "email@test.com")
+#'                      username = "example@email.com.au")
 #'
 #' @seealso https://www.longpaddock.qld.gov.au/cgi-bin/silo/PatchedPointDataset.php
 #' @export
@@ -60,13 +60,6 @@ LongPaddock_ppd <- function(station, start, finish = format(Sys.time() + 86400, 
   return(Data)
 }
 
-#examples
-df <- LongPaddock_ppd(station = "32043",
-                      start = format(Sys.time() - (365*86400), "%Y%m%d"),
-                      format = "standard",
-                      username = "cameron.roberts@des.qld.gov.au")
-
-
 
 #' Retrieve gridded data from LongPaddock
 #'
@@ -83,14 +76,11 @@ df <- LongPaddock_ppd(station = "32043",
 #' @return A tibble with the gridded data.
 #'
 #' @examples
-#' lat = "-18.50"
-#' long = "145.98"
-#'
 #' df <- LongPaddock_grid(lat = "-18.50",
 #'                       long = "145.98",
 #'                      start = format(Sys.time() - (700*86400), "%Y%m%d"),
 #'                      format = "alldata",
-#'                      username = "cameron.roberts@des.qld.gov.au")
+#'                      username = "example@email.com.au")
 #'
 #' @seealso https://www.longpaddock.qld.gov.au/cgi-bin/silo/DataDrillDataset.php
 #'
