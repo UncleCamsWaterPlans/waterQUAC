@@ -1,8 +1,2 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^data-raw$
-^LICENSE\.md$
-^WQI\.Rcheck$
-^WQI.*\.tar\.gz$
-^WQI.*\.tgz$
-^\.github$

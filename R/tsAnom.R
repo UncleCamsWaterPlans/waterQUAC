@@ -13,6 +13,8 @@
 #' @param sd_width The width of the rolling window used to calculate the standard deviation of the median log(value).
 #' @return A data frame with the original data and a new column called Quality that indicates the type of anomaly, if any.
 #'
+#' @importFrom stats sd
+#' @importFrom stats median
 #' @examples
 #'
 #' #OVERWRITE <-
@@ -31,8 +33,8 @@
 #' #
 #' #tst <- ts.anom(df, OVERWRITE, 0, 650)
 #' #
-#' #tst %>%
-#' #  plotly::plot_ly() %>%
+#' #tst |>
+#' #  plotly::plot_ly() |>
 #' #  plotly::add_markers(x=~ts, y=~Value, type = "scatter", color = ~Quality)
 #'
 #' @export

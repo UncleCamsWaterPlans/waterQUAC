@@ -55,8 +55,8 @@ detect spikes in the data.
 #
 #tst <- ts.anom(df, OVERWRITE, 0, 650)
 #
-#tst \%>\%
-#  plotly::plot_ly() \%>\%
+#tst |>
+#  plotly::plot_ly() |>
 #  plotly::add_markers(x=~ts, y=~Value, type = "scatter", color = ~Quality)
 
 }
