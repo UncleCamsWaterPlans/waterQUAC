@@ -35,7 +35,7 @@ function returns a tibble with the patched point data.
 df <- LongPaddock_ppd(station = "32043",
                      start = format(Sys.time() - (365*86400), "\%Y\%m\%d"),
                      format = "standard",
-                     username = "email@test.com")
+                     username = "example@email.com.au")
 
 }
 \seealso{

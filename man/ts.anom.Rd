@@ -4,30 +4,20 @@
 \alias{ts.anom}
 \title{Detect anomalies in time series data}
 \usage{
-ts.anom(
-  df,
-  OVERWRITE,
-  sensorMin,
-  sensorMax,
-  flatln = 3,
-  med_width = 36,
-  sd_width = 100
-)
+ts.anom(df, overwrite, sensorMin, sensorMax, window = 3, prec = 0.001)
 }
 \arguments{
 \item{df}{A data frame containing the time series water quality or quantity data.}
 
-\item{OVERWRITE}{A vector of quality codes that can be overwritten by the function.}
+\item{overwrite}{A vector of quality codes that CAN be overwritten by the function.}
 
 \item{sensorMin}{The minimum value as reportable from the sensor for the given data.}
 
 \item{sensorMax}{The maximum value as reportable from the sensor for the given data.}
 
-\item{flatln}{The number of times the average data logging interval is used to calculate the rolling window for flatline detection. For example if the average read time is hourly, flatln = 3 means consecutive values across a 3 hour interval will flag.}
+\item{window}{The number of hours the average data logging interval is used to calculate the rolling window for flatline detection. For example if the average read time is hourly, flatln = 3 means consecutive values across a 3 hour interval will flag.}
 
-\item{med_width}{The width of the rolling window used to calculate the median of the log(value).}
-
-\item{sd_width}{The width of the rolling window used to calculate the standard deviation of the median log(value).}
+\item{prec}{The precision of the sensor OR how much variation is acceptable to determine a repeating value}
 }
 \value{
 A data frame with the original data and a new column called Quality that indicates the type of anomaly, if any.
@@ -39,24 +29,23 @@ detect spikes in the data.
 }
 \examples{
 
-OVERWRITE <-
-  c(155,
-    101,
-    105,
-    2200,
-    1020,
-    2000,
-    2010:2015,
-    2210:2215,
-    3061:3068,
-    3211:3214) #overwritable QC codes, all else are retained
+df <- waterQUAC::TSS_data
 
+manual_codes = c(1:4000)
+sensorMin = 0
+sensorMax = 650
 
-
-tst <- ts.anom(waterQUAC::TSS_data, OVERWRITE, 0, 650)
-
+tst <- ts.anom(df = df,
+              overwrite = manual_codes,
+              sensorMin = 0,
+              sensorMax = 650)
 tst |>
-  plotly::plot_ly() |>
-  plotly::add_markers(x=~ts, y=~Value, type = "scatter", color = ~Quality)
+ plotly::plot_ly() |>
+ plotly::add_markers(
+   x =  ~ ts,
+   y =  ~ Value,
+   type = "scatter",
+   color = ~ Quality
+ )
 
 }
