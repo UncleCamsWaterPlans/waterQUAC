@@ -1,6 +1,6 @@
 ---
-title: "Vignette Title"
-author: "Vignette Author"
+title: "waterQUAC:: Water Data Quality Control"
+author: "Cameron Roberts"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -16,21 +16,123 @@ knitr::opts_chunk$set(
 )
 ```
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+# Introduction
 
--   Never uses retina figures
--   Has a smaller default figure size
--   Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+This R library has been developed as a tool-set for processing high frequency water quality and quantity data. It features easy API data extraction functions from common endpoints:
 
-```{r}
+-   [eagle.IO](https://eagle.io/)
+
+    -   Common online data repository for remote telemetered datasets
+
+-   Queensland Governments [Water Monitoring Information Portal](https://water-monitoring.information.qld.gov.au/)
+
+    -   Source for much of Queenslands hydrometric data
+
+-   Queensland Governments [Long Paddock](https://www.longpaddock.qld.gov.au/)
+
+    -   Source for
+
+-   [OpenWeatherMap](https://www.longpaddock.qld.gov.au/)
+
+```{r Example dataset for anomaly detection}
+#devtools::install_github("https://github.com/UncleCamsWaterPlans/waterQUAC")
 library(waterQUAC)
-
-OVERWRITE <- c(1:4000) #overwritable QC codes, all else are retained. In this case, all codes will be overwritten
-
-#load in a test dataset for this example. See format of dataframe
+library(plotly)
+#load in a test dataset for this example. See format of dataframe for required input format
 df <- waterQUAC::TSS_data[1:3000,]
 
+head(df)
+```
 
+```{r}
+# import discharge data from WMIP (Herbert River at Ingham - 1160001F)
+discharge <- waterQUAC::WMIP_Extract("116001F", 
+                                "20220701", 
+                                "discharge",
+                                "AT",
+                                "20230630")
+
+# extract gridded weather obs data from that locaiton (SILO)
+rain <- waterQUAC::LongPaddock_grid(lat = "-18.62831", 
+                                    long = "146.16486",
+                                    start = "20220701",
+                                    finish = "20230630",
+                                    username = "example@email.com.au")
+
+#plot daily rainfall against stream discharge
+
+discharge %>%
+  plot_ly() %>%
+  add_trace(
+    x =  ~ time,
+    y =  ~ value,
+    mode = "lines",
+    name = "Stream Discharge (m^3/s)",
+    type = "scatter",
+    fill = "tozeroy",
+    line = list(
+      color = "tozeroy",
+      width = 2.5,
+      dash = 'solid'
+    ),
+    connectgaps = TRUE
+  )  %>%
+  add_trace(
+    x = ~ rain$Date,
+    y = ~ rain$Rain,
+    type = 'bar',
+    yaxis = "y3",
+    name = "Daily Rainfall",
+    marker = list(
+      color = "darkblue",
+      opacity = 0.3,
+      size = 10
+    )
+  ) %>%
+  
+  layout(
+    legend = list(orientation = 'h'),
+    xaxis = list(title = FALSE, 
+                 showgrid = FALSE,
+                 domain=c(0,0.85)),
+    yaxis = list(
+      title = list(text = "<b>Stream Level</b> (m)", font = list(size = 15)),
+      showgrid = FALSE,
+      side = "right"
+    ),
+    yaxis3 = list(
+      tickfont = list(color = "darkblue"),
+      showgrid = FALSE,
+      overlaying = "y",
+      side = "right",
+      anchor = "free",
+      position = 0.92,
+      autorange = "reversed",
+      title = list(text = "<b>Rainfall</b> (mm)", font = list(size = 15))
+    )
+  ) %>%
+  #Add modebar buttons
+  config(
+    modeBarButtonsToAdd = list(
+      'drawline',
+      'drawopenpath',
+      'drawclosedpath',
+      'drawcircle',
+      'drawrect',
+      'eraseshape'
+    )
+  )
+
+
+```
+
+## Time series quality coding
+
+Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+
+```{r}
+#overwritable QC codes, all else are retained. In this case, all codes will be overwritten
+OVERWRITE <- c(1:4000) 
 df_qc <- ts.anom(df,
                  OVERWRITE,
                  sensorMin = 0,
@@ -47,49 +149,4 @@ df_qc |>
   )
 ```
 
-## Vignette Info
-
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
-
-## Styles
-
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
-
-```         
-output: 
-  rmarkdown::html_vignette:
-    css: mystyles.css
-```
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side.
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
-```
-
-You can enable figure captions by `fig_caption: yes` in YAML:
-
-```         
-output:
-  rmarkdown::html_vignette:
-    fig_caption: yes
-```
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes[^1], and tables, e.g. using `knitr::kable()`.
-
-[^1]: A footnote here.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
-```
-
-Also a quote using `>`:
-
-> "He who gives up [code] safety for [code] speed deserves neither." ([via](https://twitter.com/hadleywickham/status/504368538874703872))
+## 
