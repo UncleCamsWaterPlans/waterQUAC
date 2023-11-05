@@ -22,7 +22,7 @@
 #'sensorMin = 0
 #'sensorMax = 650
 #'
-#'tst <- ts.anom(df = df,
+#'tst <- ts_anom(df = df,
 #'               overwrite = manual_codes,
 #'               sensorMin = 0,
 #'               sensorMax = 650)
@@ -37,7 +37,7 @@
 #'
 #' @export
 
-ts.anom <- function(df, overwrite, sensorMin, sensorMax, window = 3, prec = 0.001) {
+ts_anom <- function(df, overwrite, sensorMin, sensorMax, window = 3, prec = 0.001) {
 
   #check for a quality column if not add one with NA's
   if (!"Quality" %in% names(df)) {

@@ -22,38 +22,33 @@ This R library has been developed as a tool-set for processing high frequency wa
 
 -   [eagle.IO](https://eagle.io/)
 
-    -   Common online data repository for remote telemetered datasets
+    -   *Common online data repository for remote telemetered datasets*
 
 -   Queensland Governments [Water Monitoring Information Portal](https://water-monitoring.information.qld.gov.au/)
 
-    -   Source for much of Queenslands hydrometric data
+    -   *Source for much of Queenslands hydrometric data*
 
 -   Queensland Governments [Long Paddock](https://www.longpaddock.qld.gov.au/)
 
-    -   Source for
+    -   *Source for climate data from the Queensland Government*
 
 -   [OpenWeatherMap](https://www.longpaddock.qld.gov.au/)
 
-```{r Example dataset for anomaly detection}
+```{r}
 #devtools::install_github("https://github.com/UncleCamsWaterPlans/waterQUAC")
 library(waterQUAC)
 library(plotly)
-#load in a test dataset for this example. See format of dataframe for required input format
-df <- waterQUAC::TSS_data[1:3000,]
 
-head(df)
-```
 
-```{r}
 # import discharge data from WMIP (Herbert River at Ingham - 1160001F)
-discharge <- waterQUAC::WMIP_Extract("116001F", 
-                                "20220701", 
+discharge <- waterQUAC::wmip_hist("116001F", 
                                 "discharge",
                                 "AT",
+                                "20220701",
                                 "20230630")
 
 # extract gridded weather obs data from that locaiton (SILO)
-rain <- waterQUAC::LongPaddock_grid(lat = "-18.62831", 
+rain <- waterQUAC::silo_grid(lat = "-18.62831", 
                                     long = "146.16486",
                                     start = "20220701",
                                     finish = "20230630",
@@ -130,23 +125,36 @@ discharge %>%
 
 Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
 
-```{r}
-#overwritable QC codes, all else are retained. In this case, all codes will be overwritten
-OVERWRITE <- c(1:4000) 
-df_qc <- ts.anom(df,
-                 OVERWRITE,
-                 sensorMin = 0,
-                 sensorMax = 650)
+```{r Example dataset for anomaly detection}
+#load in a test dataset for this example. See format of dataframe for required input format
+df <- waterQUAC::TSS_data[1:3000,]
 
-#plot the data
-df_qc |>
-  plotly::plot_ly() |>
-  plotly::add_markers(
-    x =  ~ ts,
-    y =  ~ Value,
-    type = "scatter",
-    color = ~ Quality
-  )
+head(df)
+
+```
+
+```{r}
+#example Totasl Suspended Solids dataframe
+df <- waterQUAC::TSS_data
+
+#overwritable QC codes, all else are retained. In this case, all codes will be overwritten
+manual_codes = c(1:4000)
+#upper and lower limits for the sensor uses (Trios Opus)
+sensorMin = 0
+sensorMax = 650
+
+tst <- ts_anom(df = df,
+              overwrite = manual_codes,
+              sensorMin = 0,
+              sensorMax = 650)
+tst |>
+ plotly::plot_ly() |>
+ plotly::add_markers(
+   x =  ~ ts,
+   y =  ~ Value,
+   type = "scatter",
+   color = ~ Quality
+ )
 ```
 
 ## 

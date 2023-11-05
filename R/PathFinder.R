@@ -4,8 +4,8 @@
 #'
 #' @source \url{https://www.trios.de/en/}
 #'
-#' @param ProbeType The type of probe (OPUS/NICO)
-#' @param PathLength the path-length of interest for the relevant probe (2/5/10/20mm)
+#' @param probe The type of probe (OPUS/NICO)
+#' @param path the path-length of interest for the relevant probe (2/5/10/20mm)
 #'
 #' @examples
 #' #Limits <- PathFinder(ProbeType = "OPUS", PathLength = 5)
@@ -15,32 +15,32 @@
 #'
 #' @export
 
-PathFinder <- function(ProbeType, PathLength){
+trios_path <- function(probe, path){
   Limits <- list() #create a blank list
-  if(ProbeType == "OPUS"){
+  if(probe == "OPUS"){
 
-  if (PathLength == 2) {
+  if (path == 2) {
   Limits <- list(
   NO3LowerLim = 0.15,     # determination limit
   NO3UpperLim = 50,       # Max range
   TSSUpperLim = 650,
   TSSLowerLim = 20
   )
-} else if(PathLength == 5) {
+} else if(path == 5) {
   Limits <- list(
   NO3LowerLim = 0.06,
   NO3UpperLim = 20,
   TSSUpperLim = 260,
   TSSLowerLim = 8
   )
-} else if(PathLength == 10) {
+} else if(path == 10) {
   Limits <- list(
   NO3LowerLim = 0.03,
   NO3UpperLim = 10,
   TSSUpperLim = 130,
   TSSLowerLim = 4
   )
-} else if(PathLength == 20) {
+} else if(path == 20) {
   Limits <- list(
   NO3LowerLim = 0.015,
   NO3UpperLim = 5,
@@ -49,18 +49,18 @@ PathFinder <- function(ProbeType, PathLength){
   )
 } else {(print("DON'T FORGET TO CHECK YOUR PATHLENGTH"))}
 
-  } else if(ProbeType == "NICO"){ #Decision tree for NICO Pathlength limits
-    if (PathLength == 2) {
+  } else if(probe == "NICO"){ #Decision tree for NICO Pathlength limits
+    if (path == 2) {
       Limits <- list(
       NO3LowerLim = 0.75,     # determination limit
       NO3UpperLim = 30       # Max range
       )
-    } else if(PathLength == 5) {
+    } else if(path == 5) {
       Limits <- list(
       NO3LowerLim = 0.3,
       NO3UpperLim = 12
       )
-    } else if(PathLength == 10) {
+    } else if(path == 10) {
       Limits <- list(
       NO3LowerLim = 0.15,
       NO3UpperLim = 6

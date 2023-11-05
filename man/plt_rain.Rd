@@ -18,9 +18,14 @@ a dataframe with rainfall data as input. The
 function returns a Plotly figure.
 }
 \examples{
-df <- LP_nearSite(station = "32002")
+df <- silo_ppd(
+  station = "32043",
+  start = format(Sys.time() - (365 * 86400), "\%Y\%m\%d"),
+  format = "standard",
+  username = "example@email.com.au"
+)
 
-fig <- plt_rain(df)
+plt_rain(df)
 
 }
 \seealso{

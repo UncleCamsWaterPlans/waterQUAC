@@ -8,19 +8,19 @@
 }
 \usage{
 NICO_Hist(
-  APIKEY,
+  key,
   NNO3,
   refA,
   refB,
   refC,
   refD,
   SQI,
-  START,
-  END = format(Sys.time() + 86400, "\%Y-\%m-\%dT\%H:\%M:\%SZ")
+  start_time,
+  end_time = format(Sys.time() + 86400, "\%Y-\%m-\%dT\%H:\%M:\%SZ")
 )
 }
 \arguments{
-\item{APIKEY}{This is required for all functions and can be generated from the account settings in WQI's Eagle.IO instance}
+\item{key}{This is required for all functions and can be generated from the account settings in WQI's Eagle.IO instance}
 
 \item{NNO3}{A node ID for a given sites NNO3 parameter in eagle.IO.}
 
@@ -34,9 +34,9 @@ NICO_Hist(
 
 \item{SQI}{A node ID for a given sites SQI parameter in eagle.IO.}
 
-\item{START}{DateTime to start the historic period of capture. Format needs to be in ISO8601, see: 2014-10-09T22:38:10Z || 2014-10-09T22:38:10.000Z || 2014-10-09T20:38:10+0200 || 2014-10-09T20:38:10+02:00}
+\item{start_time}{DateTime to start the historic period of capture. Format needs to be in ISO8601, see: 2014-10-09T22:38:10Z || 2014-10-09T22:38:10.000Z || 2014-10-09T20:38:10+0200 || 2014-10-09T20:38:10+02:00}
 
-\item{END}{DateTime to end the historic period of capture. Defaults to the current system time + one day. Format needs to be in ISO8601, see: 2014-10-09T22:38:10Z || 2014-10-09T22:38:10.000Z || 2014-10-09T20:38:10+0200 || 2014-10-09T20:38:10+02:00}
+\item{end_time}{DateTime to end the historic period of capture. Defaults to the current system time + one day. Format needs to be in ISO8601, see: 2014-10-09T22:38:10Z || 2014-10-09T22:38:10.000Z || 2014-10-09T20:38:10+0200 || 2014-10-09T20:38:10+02:00}
 }
 \value{
 tibble containing returned historic data for OPUS reportable parameters and associsated spectral values, value and quality. Time as "Australia/Brisbane"

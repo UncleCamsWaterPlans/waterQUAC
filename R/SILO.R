@@ -12,7 +12,7 @@
 #' @return A tibble with the patched point data.
 #'
 #' @examples
-#' df <- LongPaddock_ppd(station = "32043",
+#' df <- silo_ppd(station = "32043",
 #'                      start = format(Sys.time() - (365*86400), "%Y%m%d"),
 #'                      format = "standard",
 #'                      username = "example@email.com.au")
@@ -20,7 +20,7 @@
 #' @seealso https://www.longpaddock.qld.gov.au/cgi-bin/silo/PatchedPointDataset.php
 #' @export
 #'
-LongPaddock_ppd <- function(station, start, finish = format(Sys.time() + 86400, "%Y%m%d"), format = "standard", username) {
+silo_ppd <- function(station, start, finish = format(Sys.time() + 86400, "%Y%m%d"), format = "standard", username) {
 
 
   URLData <- paste("https://www.longpaddock.qld.gov.au/cgi-bin/silo/PatchedPointDataset.php?station=",station,"&start=",start,"&finish=",finish,"&format=",format,"&comment=no&username=",username,"",sep = "")
@@ -76,7 +76,7 @@ LongPaddock_ppd <- function(station, start, finish = format(Sys.time() + 86400, 
 #' @return A tibble with the gridded data.
 #'
 #' @examples
-#' df <- LongPaddock_grid(lat = "-18.50",
+#' df <- silo_grid(lat = "-18.50",
 #'                       long = "145.98",
 #'                      start = format(Sys.time() - (700*86400), "%Y%m%d"),
 #'                      format = "alldata",
@@ -86,7 +86,7 @@ LongPaddock_ppd <- function(station, start, finish = format(Sys.time() + 86400, 
 #'
 #' @export
 
-LongPaddock_grid <- function(lat, long, start, finish = format(Sys.time() + 86400, "%Y%m%d"), format = "standard", username) {
+silo_grid <- function(lat, long, start, finish = format(Sys.time() + 86400, "%Y%m%d"), format = "standard", username) {
 
 
   URLData <- paste("https://www.longpaddock.qld.gov.au/cgi-bin/silo/DataDrillDataset.php?lat=",lat,"&lon=",long,"&start=",start,"&finish=",finish,"&format=",format,"&comment=no&username=",username,"&password=apirequest",sep = "")
@@ -127,7 +127,7 @@ LongPaddock_grid <- function(lat, long, start, finish = format(Sys.time() + 8640
 #' @return A tibble with the near-site data.
 #'
 #' @examples
-#' df <- LP_nearSite(station = "32002")
+#' df <- silo_nearby(station = "32002")
 #'
 #' @seealso https://www.longpaddock.qld.gov.au/cgi-bin/silo/PatchedPointDataset.php?format=near
 #'
@@ -136,7 +136,7 @@ LongPaddock_grid <- function(lat, long, start, finish = format(Sys.time() + 8640
 
 
 
-LP_nearSite <- function(station, radius = "50") {
+silo_nearby <- function(station, radius = "50") {
 
   URLData <- paste("https://www.longpaddock.qld.gov.au/cgi-bin/silo/PatchedPointDataset.php?format=near&station=",station,"&radius=",radius, sep = "")
 
@@ -160,9 +160,14 @@ LP_nearSite <- function(station, radius = "50") {
 #' @return A Plotly figure.
 #'
 #' @examples
-#' df <- LP_nearSite(station = "32002")
+#' df <- silo_ppd(
+#'   station = "32043",
+#'   start = format(Sys.time() - (365 * 86400), "%Y%m%d"),
+#'   format = "standard",
+#'   username = "example@email.com.au"
+#' )
 #'
-#' fig <- plt_rain(df)
+#' plt_rain(df)
 #'
 #' @seealso https://plotly.com/r/
 #'

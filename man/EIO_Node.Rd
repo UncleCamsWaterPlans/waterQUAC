@@ -7,12 +7,12 @@
 \url{https://wqi.eagle.io/}
 }
 \usage{
-EIO_Node(APIKEY, param)
+EIO_Node(key, node_id)
 }
 \arguments{
-\item{APIKEY}{== This is required for all functions and can be generated from the account settings in WQI's Eagle.IO instance}
+\item{key}{== This is required for all functions and can be generated from the account settings in WQI's Eagle.IO instance}
 
-\item{param}{== a node ID of a given parameter in eagle.IO, noting historic will only work with nodes that contain historic data}
+\item{node_id}{== a node ID of a given parameter in eagle.IO, noting historic will only work with nodes that contain historic data}
 }
 \value{
 data frame containing returned node data
@@ -21,6 +21,6 @@ data frame containing returned node data
 Will extract the current value for a given NODE ID from WQI's eagle.IO instance.
 }
 \examples{
-#content <- EIO_Node(APIKEY = "XYZ", param = "59cca1064f2ee90c99b94b2e")
+#content <- EIO_Node(key = "XYZ", param = "59cca1064f2ee90c99b94b2e")
 
 }

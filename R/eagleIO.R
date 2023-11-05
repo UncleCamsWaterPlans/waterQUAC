@@ -4,34 +4,32 @@
 #'
 #' @source \url{https://wqi.eagle.io/}
 #'
-#' @param APIKEY This is required for all functions and can be generated from the account settings in WQI's Eagle.IO instance
-#' @param param A node ID of a given parameter in eagle.IO, noting historic will only work with nodes that contain historic data (ie level/N-NO3/Turbidity).
-#' @param START DateTime to start the historic period of capture. Format needs to be in ISO8601, see: 2014-10-09T22:38:10Z || 2014-10-09T22:38:10.000Z || 2014-10-09T20:38:10+0200 || 2014-10-09T20:38:10+02:00
-#' @param END DateTime to end the historic period of capture. Defaults to the current system time + one day. Format needs to be in ISO8601, see: 2014-10-09T22:38:10Z || 2014-10-09T22:38:10.000Z || 2014-10-09T20:38:10+0200 || 2014-10-09T20:38:10+02:00
+#' @param key This is required for all functions and can be generated from the account settings in WQI's Eagle.IO instance
+#' @param node_id A node ID of a given parameter in eagle.IO, noting historic will only work with nodes that contain historic data (ie level/N-NO3/Turbidity).
+#' @param start_time DateTime to start the historic period of capture. Format needs to be in ISO8601, see: 2014-10-09T22:38:10Z || 2014-10-09T22:38:10.000Z || 2014-10-09T20:38:10+0200 || 2014-10-09T20:38:10+02:00
+#' @param end_time DateTime to end the historic period of capture. Defaults to the current system time + one day. Format needs to be in ISO8601, see: 2014-10-09T22:38:10Z || 2014-10-09T22:38:10.000Z || 2014-10-09T20:38:10+0200 || 2014-10-09T20:38:10+02:00
+#' @return tibble containing returned historic data, value and quality. Time as "Australia/Brisbane"
 #'
 #' @examples
 #' #td <- 86400
 #' #START <- format(Sys.time() -30*td, "%Y-%m-%dT%H:%M:%SZ") # note this will be in UTC
-#' #content <- EIO_Hist(APIKEY = "XYZ", param = "5903e538bd10c2fa0ce50648", START = 1)
+#' #content <- eio_hist(key = "XYZ", param = "5903e538bd10c2fa0ce50648", START = 1)
 #' #library(tidyverse)
 #' #reportableParamRef <- WQI::reportableParamRef
 #' #param <- reportableParamRef |>
 #' #  filter(GSnum == '1160122')
 #' #param <- param$`N-NO3`
 #'
-#' @return tibble containing returned historic data, value and quality. Time as "Australia/Brisbane"
-#'
 #' @export
-#'
 
-EIO_Hist <- function(APIKEY, param, START, END = format(Sys.time() + 86400, "%Y-%m-%dT%H:%M:%SZ")) {
+eio_hist <- function(key, node_id, start_time, end_time = format(Sys.time() + 86400, "%Y-%m-%dT%H:%M:%SZ")) {
   #param -- MUST be a node ID corresponding to a historic data source (ie level/N-NO3/Turbidity)
 
-  URLData <- paste("https://api.eagle.io/api/v1/historic/?params=",param,"&startTime=",START,"&endTime=",END,"&qualityExcluded=NONE",sep = "")
+  URLData <- paste("https://api.eagle.io/api/v1/historic/?params=",node_id,"&startTime=",start_time,"&endTime=",end_time,"&qualityExcluded=NONE",sep = "")
 
   #API call GET
   APIData <- httr::GET(URLData,
-                       httr::add_headers('X-Api-Key' = APIKEY,
+                       httr::add_headers('X-Api-Key' = key,
                                    'Content-Type' = "application/json"))
   Node_content=jsonlite::fromJSON(rawToChar(APIData$content))
 
@@ -58,15 +56,15 @@ EIO_Hist <- function(APIKEY, param, START, END = format(Sys.time() + 86400, "%Y-
 #'
 #' @source \url{https://wqi.eagle.io/}
 #'
-#' @param APIKEY This is required for all functions and can be generated from the account settings in WQI's Eagle.IO instance
+#' @param key This is required for all functions and can be generated from the account settings in WQI's Eagle.IO instance
 #' @param NNO3 A node ID for a given sites NNO3 parameter in eagle.IO.
 #' @param TSSeq A node ID for a given sites TSSeq parameter in eagle.IO.
 #' @param abs210 A node ID for a given sites abs210 parameter in eagle.IO.
 #' @param abs254 A node ID for a given sites abs254 parameter in eagle.IO.
 #' @param abs360 A node ID for a given sites abs360 parameter in eagle.IO.
 #' @param SQI A node ID for a given sites SQI parameter in eagle.IO.
-#' @param START DateTime to start the historic period of capture. Format needs to be in ISO8601, see: 2014-10-09T22:38:10Z || 2014-10-09T22:38:10.000Z || 2014-10-09T20:38:10+0200 || 2014-10-09T20:38:10+02:00
-#' @param END DateTime to end the historic period of capture. Defaults to the current system time + one day. Format needs to be in ISO8601, see: 2014-10-09T22:38:10Z || 2014-10-09T22:38:10.000Z || 2014-10-09T20:38:10+0200 || 2014-10-09T20:38:10+02:00
+#' @param start_time DateTime to start the historic period of capture. Format needs to be in ISO8601, see: 2014-10-09T22:38:10Z || 2014-10-09T22:38:10.000Z || 2014-10-09T20:38:10+0200 || 2014-10-09T20:38:10+02:00
+#' @param end_time DateTime to end the historic period of capture. Defaults to the current system time + one day. Format needs to be in ISO8601, see: 2014-10-09T22:38:10Z || 2014-10-09T22:38:10.000Z || 2014-10-09T20:38:10+0200 || 2014-10-09T20:38:10+02:00
 #'
 #' @examples
 #' #loggerRef <- WQI::loggerRef
@@ -88,15 +86,15 @@ EIO_Hist <- function(APIKEY, param, START, END = format(Sys.time() + 86400, "%Y-
 #'
 #'
 
-OPUS_Hist <- function(APIKEY, NNO3, TSSeq, abs210, abs254, abs360, SQI, START, END = format(Sys.time() + 86400, "%Y-%m-%dT%H:%M:%SZ")) {
+OPUS_Hist <- function(key, NNO3, TSSeq, abs210, abs254, abs360, SQI, start_time, end_time = format(Sys.time() + 86400, "%Y-%m-%dT%H:%M:%SZ")) {
 
   params <- paste(NNO3, TSSeq, abs210, abs254, abs360, SQI, sep = ",")
 
-  URLData <- paste("https://api.eagle.io/api/v1/historic/?params=",params,"&startTime=",START,"&endTime=",END,"&qualityExcluded=NONE",sep = "")
+  URLData <- paste("https://api.eagle.io/api/v1/historic/?params=",params,"&startTime=",start_time,"&endTime=",end_time,"&qualityExcluded=NONE",sep = "")
 
   #API call GET
   APIData <- httr::GET(URLData,
-                       httr::add_headers('X-Api-Key' = APIKEY,
+                       httr::add_headers('X-Api-Key' = key,
                                          'Content-Type' = "application/json"))
   Node_content=jsonlite::fromJSON(rawToChar(APIData$content))
 
@@ -153,15 +151,15 @@ OPUS_Hist <- function(APIKEY, NNO3, TSSeq, abs210, abs254, abs360, SQI, START, E
 #'
 #' @source \url{https://wqi.eagle.io/}
 #'
-#' @param APIKEY This is required for all functions and can be generated from the account settings in WQI's Eagle.IO instance
+#' @param key This is required for all functions and can be generated from the account settings in WQI's Eagle.IO instance
 #' @param NNO3 A node ID for a given sites NNO3 parameter in eagle.IO.
 #' @param refA A node ID for a given sites refA parameter in eagle.IO.
 #' @param refB A node ID for a given sites refB parameter in eagle.IO.
 #' @param refC A node ID for a given sites refC parameter in eagle.IO.
 #' @param refD A node ID for a given sites refD parameter in eagle.IO.
 #' @param SQI A node ID for a given sites SQI parameter in eagle.IO.
-#' @param START DateTime to start the historic period of capture. Format needs to be in ISO8601, see: 2014-10-09T22:38:10Z || 2014-10-09T22:38:10.000Z || 2014-10-09T20:38:10+0200 || 2014-10-09T20:38:10+02:00
-#' @param END DateTime to end the historic period of capture. Defaults to the current system time + one day. Format needs to be in ISO8601, see: 2014-10-09T22:38:10Z || 2014-10-09T22:38:10.000Z || 2014-10-09T20:38:10+0200 || 2014-10-09T20:38:10+02:00
+#' @param start_time DateTime to start the historic period of capture. Format needs to be in ISO8601, see: 2014-10-09T22:38:10Z || 2014-10-09T22:38:10.000Z || 2014-10-09T20:38:10+0200 || 2014-10-09T20:38:10+02:00
+#' @param end_time DateTime to end the historic period of capture. Defaults to the current system time + one day. Format needs to be in ISO8601, see: 2014-10-09T22:38:10Z || 2014-10-09T22:38:10.000Z || 2014-10-09T20:38:10+0200 || 2014-10-09T20:38:10+02:00
 #'
 #' @examples
 #' #loggerRef <- WQI::loggerRef
@@ -184,15 +182,15 @@ OPUS_Hist <- function(APIKEY, NNO3, TSSeq, abs210, abs254, abs360, SQI, START, E
 #'
 
 
-NICO_Hist <- function(APIKEY, NNO3, refA, refB, refC, refD, SQI, START, END = format(Sys.time() + 86400, "%Y-%m-%dT%H:%M:%SZ")) {
+NICO_Hist <- function(key, NNO3, refA, refB, refC, refD, SQI, start_time, end_time = format(Sys.time() + 86400, "%Y-%m-%dT%H:%M:%SZ")) {
 
   params <- paste(NNO3, refA, refB, refC, refD, SQI, sep = ",")
 
-  URLData <- paste("https://api.eagle.io/api/v1/historic/?params=",params,"&startTime=",START,"&endTime=",END,"&qualityExcluded=NONE",sep = "")
+  URLData <- paste("https://api.eagle.io/api/v1/historic/?params=",params,"&startTime=",start_time,"&endTime=",end_time,"&qualityExcluded=NONE",sep = "")
 
   #API call GET
   APIData <- httr::GET(URLData,
-                       httr::add_headers('X-Api-Key' = APIKEY,
+                       httr::add_headers('X-Api-Key' = key,
                                          'Content-Type' = "application/json"))
   Node_content=jsonlite::fromJSON(rawToChar(APIData$content))
 
@@ -244,18 +242,18 @@ NICO_Hist <- function(APIKEY, NNO3, refA, refB, refC, refD, SQI, START, END = fo
 #'
 #' @source \url{https://wqi.eagle.io/}
 #'
-#' @param APIKEY == This is required for all functions and can be generated from the account settings in WQI's Eagle.IO instance
-#' @param param == a node ID of a given parameter in eagle.IO, noting historic will only work with nodes that contain historic data
+#' @param key == This is required for all functions and can be generated from the account settings in WQI's Eagle.IO instance
+#' @param node_id == a node ID of a given parameter in eagle.IO, noting historic will only work with nodes that contain historic data
 #'
 #' @return data frame containing returned comms data
 #' @export
-EIO_Comms <- function(APIKEY, param) {
+EIO_Comms <- function(key, node_id) {
   #param -- MUST be a node ID corresponding to a historic data source (ie level/N-NO3/Turbidity)
 
-  URLData <- paste("https://api.eagle.io/api/v1/nodes/?attr=currentStatus,lastCommsSuccess&filter=_id($eq:",param,")",sep="")
+  URLData <- paste("https://api.eagle.io/api/v1/nodes/?attr=currentStatus,lastCommsSuccess&filter=_id($eq:",node_id,")",sep="")
   #API call GET
   APIData <- httr::GET(URLData,
-                       httr::add_headers('X-Api-Key' = APIKEY,
+                       httr::add_headers('X-Api-Key' = key,
                                    'Content-Type' = "application/json"))
   Node_content=jsonlite::fromJSON(rawToChar(APIData$content))
 
@@ -272,22 +270,22 @@ EIO_Comms <- function(APIKEY, param) {
 #'
 #' @source \url{https://wqi.eagle.io/}
 #'
-#' @param APIKEY == This is required for all functions and can be generated from the account settings in WQI's Eagle.IO instance
-#' @param param == a node ID of a given parameter in eagle.IO, noting historic will only work with nodes that contain historic data
+#' @param key == This is required for all functions and can be generated from the account settings in WQI's Eagle.IO instance
+#' @param node_id == a node ID of a given parameter in eagle.IO, noting historic will only work with nodes that contain historic data
 #'
 #' @examples
-#' #content <- EIO_Node(APIKEY = "XYZ", param = "59cca1064f2ee90c99b94b2e")
+#' #content <- EIO_Node(key = "XYZ", param = "59cca1064f2ee90c99b94b2e")
 #'
 #' @return data frame containing returned node data
 #' @export
 #'
-EIO_Node <- function(APIKEY, param) {
+EIO_Node <- function(key, node_id) {
   #param -- MUST be a node ID corresponding to a historic data source (ie level/N-NO3/Turbidity)
 
-  URLData <- paste("https://api.eagle.io/api/v1/nodes/?attr=currentValue&filter=_id($eq:",param,")",sep="")
+  URLData <- paste("https://api.eagle.io/api/v1/nodes/?attr=currentValue&filter=_id($eq:",node_id,")",sep="")
   #API call GET
   APIData <- httr::GET(URLData,
-                       httr::add_headers('X-Api-Key' = APIKEY,
+                       httr::add_headers('X-Api-Key' = key,
                                    'Content-Type' = "application/json"))
   Node_content=jsonlite::fromJSON(rawToChar(APIData$content))
 
