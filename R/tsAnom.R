@@ -37,10 +37,13 @@
 #'
 #' @export
 
-ts_anom <- function(df, overwrite, sensorMin, sensorMax, window = 3, prec = 0.001) {
+ts_anom <- function(df, overwrite, sensorMin, sensorMax, window = 10, prec = 0.0001) {
 
-  #check for a quality column if not add one with NA's
-  if (!"Quality" %in% names(df)) {
+  # Define the pattern to match variations of "quality"
+  pattern <- "(?i)quality"
+
+  # Check if any column name matches the pattern
+  if (!any(grepl(pattern, colnames(df)))) {
     df$Quality <- NA
   }
 
