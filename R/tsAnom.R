@@ -54,7 +54,7 @@ ts_anom <- function(df, overwrite, sensorMin, sensorMax, window = 10, prec = 0.0
   #Flatline detection
 
   # Calculate the time differences between consecutive timestamps
-  time_diff <- diff(df[["ts"]])
+  time_diff <- diff(sp[["ts"]])
   # Calculate the average data logging interval per day and reduce it to match the defined window. interval = points per window
   interval <- round(((1440 / as.numeric(mean(time_diff))) / 24) * window)
 
