@@ -41,6 +41,7 @@ ts_anom <- function(df, overwrite, sensorMin, sensorMax, window = 10, prec = 0.0
 
   # Define the pattern to match variations of "quality"
   pattern <- "(?i)quality"
+  ind <- grep(pattern, colnames(df))
 
   # Check if any column name matches the pattern
   if (!any(grepl(pattern, colnames(df)))) {
@@ -67,8 +68,8 @@ ts_anom <- function(df, overwrite, sensorMin, sensorMax, window = 10, prec = 0.0
 
 
   df <- df |>
-    dplyr::mutate(`Quality` = dplyr::case_when(
-      `Quality` > 0 & !(`Quality` %in% overwrite) ~ as.character(`Quality`), # if a quality code exists and it is not listed as an OVERWRITEABLE code, retain Quality code
+    dplyr::mutate(quality = dplyr::case_when(
+      df[,ind] > 0 & !(df[,ind] %in% overwrite) ~ as.character(df[,ind]), # if a quality code exists and it is not listed as an OVERWRITEABLE code, retain Quality code
       df[,2] < 0 ~ 'impossible',                                         # bad - impossible value
       df[,2] < sensorMin ~ 'belowLimits',
       df[,2] > sensorMax ~ 'aboveLimits',                                     # bad - exceed sensor limits
@@ -78,7 +79,7 @@ ts_anom <- function(df, overwrite, sensorMin, sensorMax, window = 10, prec = 0.0
       suppressWarnings(log(df[,2])) > (3* sp$sd + sp$median) ~ 'spikeUp',   # uncertain - possible spike
       suppressWarnings(log(df[,2])) < -(3* sp$sd) + sp$median ~ 'spikeDown',  # uncertain - possible spike
       TRUE ~ 'OK' ))                                              #Q - Good - Auto QC
-  df$Quality <- factor(df$Quality,
+  df[,ind] <- factor(df[,ind],
                           levels = c("OK", "impossible", "belowLimits", "aboveLimits", "repeatingValue", "spikeUp", "spikeDown"))
 
   return(df)
