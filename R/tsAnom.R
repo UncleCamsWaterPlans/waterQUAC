@@ -47,7 +47,9 @@ ts_anom <- function(df, overwrite, sensorMin, sensorMax, window = 10, prec = 0.0
     df$Quality <- NA
   }
 
-  sp <- tibble::tibble(ts = df[,1])
+  # Find the column name that is of class "posixct"
+  posixct_column <- names(df)[sapply(df, function(x) any(class(x) == "POSIXct"))]
+  sp <- tibble::tibble(ts = df[[posixct_column]])
   #Flatline detection
 
   # Calculate the time differences between consecutive timestamps
