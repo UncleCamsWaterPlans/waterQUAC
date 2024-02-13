@@ -45,7 +45,7 @@ ts_anom <- function(df, overwrite, sensorMin, sensorMax, window = 10, prec = 0.0
 
   # Check if any column name matches the pattern
   if (!any(grepl(pattern, colnames(df)))) {
-    df$Quality <- NA
+    df$quality <- NA
   }
 
   # Find the column name that is of class "posixct"
@@ -69,7 +69,7 @@ ts_anom <- function(df, overwrite, sensorMin, sensorMax, window = 10, prec = 0.0
 
   df <- df |>
     dplyr::mutate(quality = dplyr::case_when(
-      df[,ind] > 0 & !(df[,ind] %in% overwrite) ~ as.character(df[,ind]), # if a quality code exists and it is not listed as an OVERWRITEABLE code, retain Quality code
+      quality > 0 & !(quality %in% overwrite) ~ as.character(quality), # if a quality code exists and it is not listed as an OVERWRITEABLE code, retain Quality code
       df[,2] < 0 ~ 'impossible',                                         # bad - impossible value
       df[,2] < sensorMin ~ 'belowLimits',
       df[,2] > sensorMax ~ 'aboveLimits',                                     # bad - exceed sensor limits
@@ -79,7 +79,7 @@ ts_anom <- function(df, overwrite, sensorMin, sensorMax, window = 10, prec = 0.0
       suppressWarnings(log(df[,2])) > (3* sp$sd + sp$median) ~ 'spikeUp',   # uncertain - possible spike
       suppressWarnings(log(df[,2])) < -(3* sp$sd) + sp$median ~ 'spikeDown',  # uncertain - possible spike
       TRUE ~ 'OK' ))                                              #Q - Good - Auto QC
-  df[,ind] <- factor(df[,ind],
+  quality <- factor(quality,
                           levels = c("OK", "impossible", "belowLimits", "aboveLimits", "repeatingValue", "spikeUp", "spikeDown"))
 
   return(df)
