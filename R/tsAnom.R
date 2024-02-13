@@ -49,13 +49,14 @@ ts_anom <- function(df, overwrite, sensorMin, sensorMax, window = 10, prec = 0.0
 
   # Find the column name that is of class "posixct"
   posixct_column <- names(df)[sapply(df, function(x) any(class(x) == "POSIXct"))]
+
   sp <- tibble::tibble(ts = df[[posixct_column]])
   #Flatline detection
 
   # Calculate the time differences between consecutive timestamps
   time_diff <- diff(sp[["ts"]])
   # Calculate the average data logging interval per day and reduce it to match the defined window. interval = points per window
-  interval <- round(((1440 / as.numeric(mean(time_diff))) / 24) * window)
+  interval <- round(((1440 / as.numeric(mean(time_diff), units = "mins")) / 24) * window)
 
   sp$centerSD <- zoo::rollapply(df[,2], width = interval, FUN = sd, fill = TRUE, align = 'center', na.rm = TRUE)   # a rolling window of Standard Deviation in parameter values - CENTERED -- rep_width determines the window width for all of these options
   sp$leftSD <-   zoo::rollapply(df[,2], width = interval, FUN = sd, fill = TRUE, align = 'left', na.rm = TRUE)     # a rolling window of Standard Deviation in parameter values - LEFT -- rep_width determines the window width for all of these options
