@@ -41,7 +41,6 @@ ts_anom <- function(df, overwrite, sensorMin, sensorMax, window = 10, prec = 0.0
 
   # Define the pattern to match variations of "quality"
   pattern <- "(?i)quality"
-  ind <- grep(pattern, colnames(df))
 
   # Check if any column name matches the pattern
   if (!any(grepl(pattern, colnames(df)))) {
@@ -58,9 +57,9 @@ ts_anom <- function(df, overwrite, sensorMin, sensorMax, window = 10, prec = 0.0
   # Calculate the average data logging interval per day and reduce it to match the defined window. interval = points per window
   interval <- round(((1440 / as.numeric(mean(time_diff))) / 24) * window)
 
-  sp$centerSD <- zoo::rollapply(df[,2], width = interval, FUN = sd, fill = TRUE, align = 'center')   # a rolling window of Standard Deviation in parameter values - CENTERED -- rep_width determines the window width for all of these options
-  sp$leftSD <-   zoo::rollapply(df[,2], width = interval, FUN = sd, fill = TRUE, align = 'left')     # a rolling window of Standard Deviation in parameter values - LEFT -- rep_width determines the window width for all of these options
-  sp$rightSD <-  zoo::rollapply(df[,2], width = interval, FUN = sd, fill = TRUE, align = 'right')    # a rolling window of Standard Deviation in parameter values - RIGHT -- rep_width determines the window width for all of these options
+  sp$centerSD <- zoo::rollapply(df[,2], width = interval, FUN = sd, fill = TRUE, align = 'center', na.rm = TRUE)   # a rolling window of Standard Deviation in parameter values - CENTERED -- rep_width determines the window width for all of these options
+  sp$leftSD <-   zoo::rollapply(df[,2], width = interval, FUN = sd, fill = TRUE, align = 'left', na.rm = TRUE)     # a rolling window of Standard Deviation in parameter values - LEFT -- rep_width determines the window width for all of these options
+  sp$rightSD <-  zoo::rollapply(df[,2], width = interval, FUN = sd, fill = TRUE, align = 'right', na.rm = TRUE)    # a rolling window of Standard Deviation in parameter values - RIGHT -- rep_width determines the window width for all of these options
 
   #Spike detection
   sp$median <- zoo::rollapply(suppressWarnings(log(df[,2])), width = interval, FUN = median,  partial = TRUE, na.rm = TRUE, align = 'center')   # rolling median of the log(value) for given width - med_width - centered
@@ -68,8 +67,8 @@ ts_anom <- function(df, overwrite, sensorMin, sensorMax, window = 10, prec = 0.0
 
 
   df <- df |>
-    dplyr::mutate(quality = dplyr::case_when(
-      quality > 0 & !(quality %in% overwrite) ~ as.character(quality), # if a quality code exists and it is not listed as an OVERWRITEABLE code, retain Quality code
+    dplyr::mutate(`quality` = dplyr::case_when(
+      `quality` > 0 & !(`quality` %in% overwrite) ~ as.character(`quality`), # if a quality code exists and it is not listed as an OVERWRITEABLE code, retain Quality code
       df[,2] < 0 ~ 'impossible',                                         # bad - impossible value
       df[,2] < sensorMin ~ 'belowLimits',
       df[,2] > sensorMax ~ 'aboveLimits',                                     # bad - exceed sensor limits
@@ -79,8 +78,29 @@ ts_anom <- function(df, overwrite, sensorMin, sensorMax, window = 10, prec = 0.0
       suppressWarnings(log(df[,2])) > (3* sp$sd + sp$median) ~ 'spikeUp',   # uncertain - possible spike
       suppressWarnings(log(df[,2])) < -(3* sp$sd) + sp$median ~ 'spikeDown',  # uncertain - possible spike
       TRUE ~ 'OK' ))                                              #Q - Good - Auto QC
-  quality <- factor(quality,
-                          levels = c("OK", "impossible", "belowLimits", "aboveLimits", "repeatingValue", "spikeUp", "spikeDown"))
+  df$quality <- factor(df$quality, levels = c("OK", "impossible", "belowLimits", "aboveLimits", "repeatingValue", "spikeUp", "spikeDown"))
 
   return(df)
 }
+
+df <- waterQUAC::TSS_data
+# Rename column "Quality" to "quality"
+names(df)[names(df) == "Quality"] <- "quality"
+
+
+manual_codes = c(1:4000)
+sensorMin = 0
+sensorMax = 650
+
+tst <- ts_anom(df = df,
+               overwrite = manual_codes,
+               sensorMin = 0,
+               sensorMax = 650)
+tst |>
+  plotly::plot_ly() |>
+  plotly::add_markers(
+    x =  ~ ts,
+    y =  ~ Value,
+    type = "scatter",
+    color = ~ Quality
+  )
