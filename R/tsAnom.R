@@ -83,24 +83,3 @@ ts_anom <- function(df, overwrite, sensorMin, sensorMax, window = 10, prec = 0.0
   return(df)
 }
 
-df <- waterQUAC::TSS_data
-# Rename column "Quality" to "quality"
-names(df)[names(df) == "Quality"] <- "quality"
-
-
-manual_codes = c(1:4000)
-sensorMin = 0
-sensorMax = 650
-
-tst <- ts_anom(df = df,
-               overwrite = manual_codes,
-               sensorMin = 0,
-               sensorMax = 650)
-tst |>
-  plotly::plot_ly() |>
-  plotly::add_markers(
-    x =  ~ ts,
-    y =  ~ Value,
-    type = "scatter",
-    color = ~ Quality
-  )
