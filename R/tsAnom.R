@@ -45,6 +45,8 @@ ts_anom <- function(df, overwrite, sensorMin, sensorMax, window = 10, prec = 0.0
   # Check if any column name matches the pattern
   if (!any(grepl(pattern, colnames(df)))) {
     df$quality <- NA
+  } else {
+    q_name <- colnames(df)[grep(pattern, colnames(df))]
   }
 
   # Find the column name that is of class "posixct"
@@ -67,19 +69,32 @@ ts_anom <- function(df, overwrite, sensorMin, sensorMax, window = 10, prec = 0.0
   sp$sd <-     zoo::rollapply(sp$median, width = interval*10, FUN = sd, na.rm=TRUE, partial = TRUE, align = 'center')            # rolling standard deviation of the median log(value) as calculated above for a larger window - centered
 
 
-  df <- df |>
-    dplyr::mutate(`quality` = dplyr::case_when(
-      `quality` > 0 & !(`quality` %in% overwrite) ~ as.character(`quality`), # if a quality code exists and it is not listed as an OVERWRITEABLE code, retain Quality code
-      df[,2] < 0 ~ 'impossible',                                         # bad - impossible value
-      df[,2] < sensorMin ~ 'belowLimits',
-      df[,2] > sensorMax ~ 'aboveLimits',                                     # bad - exceed sensor limits
-      sp$centerSD < prec ~ 'repeatingValue',                              # bad - repeating values
-      sp$leftSD < prec ~ 'repeatingValue',                                # bad - repeating values
-      sp$rightSD < prec ~ 'repeatingValue',                               # bad - repeating values
-      suppressWarnings(log(df[,2])) > (3* sp$sd + sp$median) ~ 'spikeUp',   # uncertain - possible spike
-      suppressWarnings(log(df[,2])) < -(3* sp$sd) + sp$median ~ 'spikeDown',  # uncertain - possible spike
-      TRUE ~ 'OK' ))                                              #Q - Good - Auto QC
-  df$quality <- factor(df$quality, levels = c("OK", "impossible", "belowLimits", "aboveLimits", "repeatingValue", "spikeUp", "spikeDown"))
+  # Use `{{ }}` for tidy evaluation of q_name inside mutate
+  df <- df %>%
+    dplyr::mutate(
+      {{ q_name }} := dplyr::case_when(
+        .data[[q_name]] > 0 & !(q_name %in% overwrite) ~ as.character(.data[[q_name]]),
+        df[[2]] < 0 ~ 'impossible',
+        df[[2]] < sensorMin ~ 'belowLimits',
+        df[[2]] > sensorMax ~ 'aboveLimits',
+        sp$centerSD < prec ~ 'repeatingValue',
+        sp$leftSD < prec ~ 'repeatingValue',
+        sp$rightSD < prec ~ 'repeatingValue',
+        suppressWarnings(log(df[[2]])) > (3 * sp$sd + sp$median) ~ 'spikeUp',
+        suppressWarnings(log(df[[2]])) < -(3 * sp$sd) + sp$median ~ 'spikeDown',
+        TRUE ~ 'OK'
+      )
+    )
+
+  df <- df %>%
+    dplyr::mutate(
+      {{ q_name }} := factor(
+        .data[[q_name]],
+        levels = c("OK", "impossible", "belowLimits",
+                   "aboveLimits", "repeatingValue",
+                   "spikeUp", "spikeDown")
+      )
+    )
 
   return(df)
 }

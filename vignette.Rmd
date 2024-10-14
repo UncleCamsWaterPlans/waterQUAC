@@ -125,16 +125,9 @@ discharge %>%
 
 Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
 
-```{r Example dataset for anomaly detection}
-#load in a test dataset for this example. See format of dataframe for required input format
-df <- waterQUAC::TSS_data[1:3000,]
-
-head(df)
-
-```
 
 ```{r}
-#example Totasl Suspended Solids dataframe
+#example Total Suspended Solids dataframe
 df <- waterQUAC::TSS_data
 
 #overwritable QC codes, all else are retained. In this case, all codes will be overwritten
