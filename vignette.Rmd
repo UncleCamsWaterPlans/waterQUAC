@@ -35,7 +35,7 @@ This R library has been developed as a tool-set for processing high frequency wa
 -   [OpenWeatherMap](https://www.longpaddock.qld.gov.au/)
 
 ```{r}
-#devtools::install_github("https://github.com/UncleCamsWaterPlans/waterQUAC")
+#remotes::install_github("https://github.com/UncleCamsWaterPlans/waterQUAC")
 library(waterQUAC)
 library(plotly)
 
@@ -123,9 +123,6 @@ discharge %>%
 
 ## Time series quality coding
 
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
-
-
 ```{r}
 #example Total Suspended Solids dataframe
 df <- waterQUAC::TSS_data
@@ -150,4 +147,8 @@ tst |>
  )
 ```
 
-## 
+
+
+Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+
+
