@@ -23,6 +23,7 @@ remotes::install_github("https://github.com/UncleCamsWaterPlans/waterQUAC")
 ```
 
 ## Usage
+### Anomaly Detection
 ```r
 library(waterQUAC)
 library(plotly)
@@ -49,6 +50,89 @@ tst |>
    color = ~ Quality
  )
 ```
+### Data Extraction
+```r
+library(waterQUAC)
+library(plotly)
 
+
+# import discharge data from WMIP (Herbert River at Ingham - 1160001F)
+discharge <- waterQUAC::wmip_hist("116001F", 
+                                "discharge",
+                                "AT",
+                                "20220701",
+                                "20230630")
+
+# extract gridded weather obs data from that locaiton (SILO)
+rain <- waterQUAC::silo_grid(lat = "-18.62831", 
+                                    long = "146.16486",
+                                    start = "20220701",
+                                    finish = "20230630",
+                                    username = "example@email.com.au")
+
+#plot daily rainfall against stream discharge
+
+discharge %>%
+  plot_ly() %>%
+  add_trace(
+    x =  ~ time,
+    y =  ~ value,
+    mode = "lines",
+    name = "Stream Discharge (m^3/s)",
+    type = "scatter",
+    fill = "tozeroy",
+    line = list(
+      color = "tozeroy",
+      width = 2.5,
+      dash = 'solid'
+    ),
+    connectgaps = TRUE
+  )  %>%
+  add_trace(
+    x = ~ rain$Date,
+    y = ~ rain$Rain,
+    type = 'bar',
+    yaxis = "y3",
+    name = "Daily Rainfall",
+    marker = list(
+      color = "darkblue",
+      opacity = 0.3,
+      size = 10
+    )
+  ) %>%
+  
+  layout(
+    legend = list(orientation = 'h'),
+    xaxis = list(title = FALSE, 
+                 showgrid = FALSE,
+                 domain=c(0,0.85)),
+    yaxis = list(
+      title = list(text = "<b>Stream Level</b> (m)", font = list(size = 15)),
+      showgrid = FALSE,
+      side = "right"
+    ),
+    yaxis3 = list(
+      tickfont = list(color = "darkblue"),
+      showgrid = FALSE,
+      overlaying = "y",
+      side = "right",
+      anchor = "free",
+      position = 0.92,
+      autorange = "reversed",
+      title = list(text = "<b>Rainfall</b> (mm)", font = list(size = 15))
+    )
+  ) %>%
+  #Add modebar buttons
+  config(
+    modeBarButtonsToAdd = list(
+      'drawline',
+      'drawopenpath',
+      'drawclosedpath',
+      'drawcircle',
+      'drawrect',
+      'eraseshape'
+    )
+  )
+```
 ## Citation
-If you use waterQUAC in your research, please cite accordingly. 
+If you use waterQUAC in your research, please cite accordingly (see About > Cite this repository). 
