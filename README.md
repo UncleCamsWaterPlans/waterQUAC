@@ -2,12 +2,18 @@
 An R library for quality control and anomaly detection in water quality datasets.
 ## Overview
 waterQUAC has been developed as a way of sharing water quality anomaly detection functions and data extraction resources. This package provides tools to streamline quality control processes for researchers and water quality professionals.
-## Features
-### Anomaly Detection
-The package offers robust functionality for:
-- Sensor limits validation
-- Spike detection
-- Flat line (recurring value) detection
+## Features:
+### Detecting anomalies in time series water quality or quantity data:
+The waterQUAC R library was developed to provide water quality practitioners with tools for automated data validation and anomaly detection. The package includes the `TSanom()` function which identifies anomalies in time series environmental sensor data by applying a combination of rule-based checks, designed to detect:
+- **Physical bounds violations**: Detects values falling outside manufacturer-specified sensor limits.
+- **Impossible values**: Identifies values that are physically implausible, such as negative values from sensors reporting non-negative measurements.
+- **Flatlining**: Identifies repeated or constant values using rolling standard deviation over a defined time window. This is often associated with errors in digital sensors whereby an unsuccessful measurement results in reporting the last value in the memory.
+- **Spikes**: Detects sudden deviations from the rolling median centred on a predefined time window. The rolling median is then compared to a threshold calculated by the rolling standard deviation of the same window. This technique is similar to Bollinger bands, a common metric in financial trading, substituting the mean with the median to reduce sensitivity to outliers and better represent the expected baseline signal.
+
+This function modifies the quality code for each observation with each point giving a first pass to the incoming dataset allowing end users and applications to omit obviously suspect data. Data that does not get flagged in any of the defined rules gets a default of `[OK]`. User-assigned quality codes can be preserved or selectively overwritten, ensuring that manual or expert-reviewed flags persist.  
+
+These methods provide a first-pass filter for raw telemetry data, enabling automated QA/QC at scale. These functions have been integrated into Microsoft-Azure based engineering pipelines which has been scaled to batch process over 100 sensors across Queensland at hourly intervals. These sensors monitor six key water quality parameters: Water Level, Conductivity, Turbidity, Temperature, Nitrate (as N), and Total Suspended Solids. The pipeline processes data hourly, aligned with telemetry intervals, and outputs validated datasets to internal systems and external stakeholders.
+
 
 ### Data Extraction
 waterQUAC includes data-extraction functions for the following resources:
