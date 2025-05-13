@@ -99,7 +99,7 @@ ts_anom <- function(df, overwrite, sensorMin, sensorMax, window = 10, prec = 0.0
     mutate(
       !!sym(q_name) := case_when(
         !is.na(.data[[q_name]]) & !(.data[[q_name]] %in% overwrite) ~ as.character(.data[[q_name]]),
-        df[[2]] < 0 | ~ 'impossible',
+        df[[2]] < 0 ~ 'impossible',
         df[[2]] < sensorMin ~ 'below_limits',
         df[[2]] > sensorMax ~ 'above_limits',
         sp$centerSD < prec ~ 'repeating_value',
