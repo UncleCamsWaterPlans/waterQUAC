@@ -66,7 +66,7 @@ ts_anom <- function(df, overwrite, sensorMin, sensorMax, window = 10, prec = 0.0
   pattern <- "(?i)quality"
 
   # Check if any column name matches the pattern
-  if (!any(grepl(pattern, colnames(drl_water_level)))) {
+  if (!any(grepl(pattern, colnames(df)))) {
     df$quality <- NA
   } else {
     q_name <- colnames(df)[grep(pattern, colnames(df))]

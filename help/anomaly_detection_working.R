@@ -1,6 +1,7 @@
 library(tidyverse)
 library(plotly)
 library(readr)
+library(waterQUAC)
 
 #example Total Suspended Solids dataframe
 df <- waterQUAC::TSS_data
