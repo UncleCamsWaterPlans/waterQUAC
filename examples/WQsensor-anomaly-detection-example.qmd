@@ -80,7 +80,7 @@ quality_colors <- c(
   "below_limits" = "#5f1937",
   "spike" = "orange",
   "repeating_value" = "purple",
-  "sensor_drift" = "brown",
+  "sensor_drift" = "#FF1493",
   "impossible" = "red",
   "Unknown" = "grey"
 )
@@ -166,7 +166,7 @@ If both conditions are met, those points are flagged as "`sensor_drift`" in the 
 
 ```{r}
 result <- detect_sensor_drift(
-  tst,#[1:30000,]
+  tst[1:30000,],
   value_col = "Value",
   overwrite = c('OK', 'spike', 'impossible')
 )
