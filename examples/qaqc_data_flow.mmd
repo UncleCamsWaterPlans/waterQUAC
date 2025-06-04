@@ -1,0 +1,21 @@
+---
+config:
+  theme: redux
+  look: classic
+  layout: dagre
+---
+flowchart TD
+ subgraph DataProcessing[" "]
+    direction TB
+        D["🛠️ Data Processing &amp; Integration<br>(Deduplication &amp; Updates)"]
+        E["🏞️ Azure Data Lakehouse<br>(Processed &amp; Structured Data)"]
+        F{{"<b>📊 Synapse SQL Views<br>on Data Lake Parquet Files</b>"}}
+  end
+    A["📡 Remote Deployed Environmental Sensors"] -- Sensor data acquisition --> B["🖥️ Data Collection Platform<br>(Eagle.io)"]
+    B -- Scheduled data ingestion --> C{"☁️ Azure Ingestion Pipeline<br>(Raw Data Intake)"}
+    C -- Raw data --> D
+    D -- Processed data --> E
+    E -- Curated dataset exposed via --> F
+    F -- Query access --> G["🌐 Public Web Applications"]
+    F -- SQL access --> H["🗄️ Internal Database Access"]
+    F -- Reporting & analysis --> I["📈 Internal BI Tools<br>(e.g., Power BI, R Shiny)"]

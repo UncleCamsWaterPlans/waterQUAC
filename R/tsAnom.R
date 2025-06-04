@@ -13,10 +13,10 @@
 #' @param sensorMin Minimum valid value as reportable from the sensor.
 #' @param sensorMax Maximum valid value as reportable from the sensor.
 #' @param window Approximate number of hours to define a rolling window size for flatline and spike detection.
-#' @param prec The precision threshold to detect repeated values (flatlines). Values within `prec` across the window are considered repeating.
+#' @param prec The precision threshold (standard deviation in the same units as input data. ie. set to 0 for absolute repetitive values, otherwise a small value to allow for some standard deviation in the window) to detect repeated values (flatlines). Values less than `prec` across the window are considered repeating.
 #' @param diag Logical; if `TRUE`, diagnostic columns used in detection (e.g., rolling SD and median) will be appended to the output.
 #'
-#' @return A data frame with the original data and an updated or newly created "Quality" column with anomaly classifications: 'impossible', 'below_limits', 'above_limits', 'repeating_value', 'spike', or 'OK'.
+#' @return A data frame with the original data and an updated or newly created "Quality" column with anomaly classifications: 'impossible', 'below_limits', 'above_limits', 'repeating_value', 'spike', or 'OK' where no QC flags have been triggered.
 #'
 #' @note The input data frame (`df`) must include the following columns:
 #'
@@ -102,9 +102,7 @@ ts_anom <- function(df, overwrite, sensorMin, sensorMax, window = 10, prec = 0.0
         df[[2]] < 0 ~ 'impossible',
         df[[2]] < sensorMin ~ 'below_limits',
         df[[2]] > sensorMax ~ 'above_limits',
-        sp$centerSD < prec ~ 'repeating_value',
-        sp$leftSD < prec ~ 'repeating_value',
-        sp$rightSD < prec ~ 'repeating_value',
+        any(c(sp$centerSD, sp$leftSD, sp$rightSD) < prec) ~ 'repeating_value',
         abs(suppressWarnings(df[[2]] - sp$median)) > (4 * sp$sd) ~ 'spike',
         TRUE ~ 'OK'
       )
