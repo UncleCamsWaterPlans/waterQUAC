@@ -64,7 +64,7 @@ tst <- ts_anom(
   df = df,
   overwrite = manual_codes,
   window = 12,
-  prec = 0,
+  #prec = 0,
   sensorMin = 0,
   sensorMax = 650,
   diag = TRUE
@@ -89,7 +89,7 @@ quality_colors <- c(
 ## Initial Quality Assessment Plot:
 
 ```{r}
-plotly::plot_ly(tst[1:30000,]) |>
+plotly::plot_ly(tst[1:30000,]) |> #
   plotly::add_markers(
     x =  ~ts,
     y =  ~Value,
@@ -166,7 +166,7 @@ If both conditions are met, those points are flagged as "`sensor_drift`" in the 
 
 ```{r}
 result <- detect_sensor_drift(
-  tst[1:30000,],
+  tst,#[1:30000,]
   value_col = "Value",
   overwrite = c('OK', 'spike', 'impossible')
 )
