@@ -1,0 +1,186 @@
+---
+title: "Sensor Data Quality Control and Drift Detection"
+author: "Cameron Roberts"
+date: "2025-06-04"
+format:
+  html:
+    theme: cosmo   # <-- Bootstrap theme; try others like cerulean, journal, flatly, darkly
+    toc: true
+    code-fold: true
+    code-tools: true
+    self-contained: true
+---
+
+
+# Introduction
+
+This document demonstrates a reproducible workflow for automated quality control (QC) and drift detection in high-frequency water quality sensor data. Using example data on Total Suspended Solids (TSS), we apply a series of anomaly detection steps based on sensor limits, flatline detection, and spike analysis. We then run a second-pass check for gradual sensor drift. The process leverages the `waterQUAC` R package and produces interactive visualizations to assist with interpreting QC outcomes.
+
+The aim is to provide a transparent, shareable, and scalable approach to maintaining data integrity in continuous water monitoring programs.
+
+```{r setup, message=FALSE, warning=FALSE}
+# Load required packages
+library(tidyverse)
+library(plotly)
+library(readr)
+library(waterQUAC)
+```
+
+## Load and Prepare Data
+
+```{r}
+# Example Total Suspended Solids dataframe
+df <- waterQUAC::TSS_data
+knitr::kable(head(df), caption = "Example Total Suspended Solids Data")
+```
+
+# Initial Quality Screening Summary (`ts_anom`)
+
+The `ts_anom()` function identifies anomalies in time series water quality or quantity data based on sensor rules and statistical checks.
+
+It flags each observation with a quality category using the following criteria:
+
+-   **Impossible values**: Values less than 0 (e.g., negative TSS) are flagged as `impossible`.
+-   **Out-of-bounds values**:
+    -   Below `sensorMin` → `below_limits`
+    -   Above `sensorMax` → `above_limits`
+-   **Flatlines / Repeating values:** Detected using very low standard deviation across rolling windows (`leftSD`, `centerSD`, `rightSD`), flagged as `repeating_value`.
+-   **Spikes**: Identified when a value deviates from the rolling median by more than 4 times the rolling standard deviation (`median ± 4*sd`), flagged as '`spike`'.
+-   **Valid readings:** If none of the above apply, the value is flagged as `OK`.
+
+## The function supports:
+
+-   Preserving or selectively overwriting existing QC flags via the overwrite parameter.
+-   Appending diagnostic columns (rolling median, SD, etc.) when `diag = TRUE`.
+
+The output is a modified data frame with updated or new `Quality` annotations, suitable for downstream QA/QC reporting or visualization.
+
+```{r}
+# Overwritable QC codes — all other codes are retained
+manual_codes <- c(1:4000)
+
+# Run anomaly detection for Trios Opus sensor
+tst <- ts_anom(
+  df = df,
+  overwrite = manual_codes,
+  window = 12,
+  #prec = 0,
+  sensorMin = 0,
+  sensorMax = 650,
+  diag = TRUE
+)
+```
+
+##### Define Quality Code Colors:
+
+```{r}
+quality_colors <- c(
+  "OK" = "#33b2ff",
+  "above_limits" = "#5f1937",
+  "below_limits" = "#5f1937",
+  "spike" = "orange",
+  "repeating_value" = "purple",
+  "sensor_drift" = "#FF1493",
+  "impossible" = "red",
+  "Unknown" = "grey"
+)
+```
+
+## Initial Quality Assessment Plot:
+
+```{r}
+plotly::plot_ly(tst[1:30000,]) |> #
+  plotly::add_markers(
+    x =  ~ts,
+    y =  ~Value,
+    type = "scatter",
+    color = ~Quality,
+    colors = quality_colors
+  ) |>
+  plotly::add_lines(
+    x = ~ts,
+    y = ~median,
+    line = list(color = 'black', dash = "dot"),
+    name = "Rolling Median"
+  ) |>
+  plotly::add_lines(
+    x = ~ts,
+    y = ~median + 4 * sd,
+    line = list(color = 'red', dash = "dash", width = 1),
+    name = "+4 SD"
+  ) |>
+  plotly::add_lines(
+    x = ~ts,
+    y = ~median - 4 * sd,
+    line = list(color = 'red', dash = "dash", width = 1),
+    name = "-4 SD"
+  )
+```
+
+# Sensor Drift Detection
+
+The `detect_sensor_drift()` function identifies gradual and sustained anomalies in time series sensor data, specifically targeting sensor drift; a condition where a sensor consistently reports higher-than-expected values over a long period.
+
+## How It Works
+
+The function checks whether sensor values:
+
+-   Exceed a dynamic threshold defined as a multiple of the median (e.g., 2× median).
+-   Remain above this threshold continuously for more than a defined number of days (default: 5 days).
+
+If both conditions are met, those points are flagged as "`sensor_drift`" in the Quality column.
+
+## Step-by-Step Logic
+
+1.  **Determine the threshold**
+
+    1.  threshold = median(Value) × threshold_multiplier
+
+    2.  Default multiplier is 2.
+
+2.  **Calculate time intervals** between successive records using the POSIXct timestamp column.
+
+3.  Track how long the sensor has **continuously stayed above the threshold**:
+
+    1.  Cumulative duration is reset to 0 once a value drops below the threshold.
+
+    2.  Time is converted from seconds to days.
+
+4.  Create or update a **Quality column**:
+
+    1.  If an appropriate quality column exists (matches "quality", case-insensitive), it’s used.
+
+    2.  Otherwise, a new column named quality is created.
+
+5.  **Drift** is only flagged if:
+
+    1.  The cumulative duration exceeds time_threshold_days, and
+
+    2.  The quality value is blank or in the list of allowable overwrite values.
+
+6.  Returns the original data with two additions:
+
+    1.  A cumulative_time_above_threshold column (in days)
+
+    2.  An updated Quality column with "sensor_drift" where appropriate
+
+```{r}
+result <- detect_sensor_drift(
+  tst[1:30000,],
+  value_col = "Value",
+  overwrite = c('OK', 'spike', 'impossible')
+)
+
+knitr::kable(head(result), caption = "Auto QC Total Suspended Solids Data")
+
+
+#Plot with Sensor Drift Detection
+plotly::plot_ly(result) |>
+  plotly::add_markers(
+    x =  ~ts,
+    y =  ~Value,
+    type = "scatter",
+    color = ~Quality,
+    colors = quality_colors
+  ) 
+```

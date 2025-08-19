@@ -2,50 +2,79 @@
 % Please edit documentation in R/tsAnom.R
 \name{ts_anom}
 \alias{ts_anom}
-\title{Detect anomalies in time series data}
+\title{Detect anomalies in time series water quality or quantity data}
 \usage{
-ts_anom(df, overwrite, sensorMin, sensorMax, window = 3, prec = 0.001)
+ts_anom(
+  df,
+  overwrite,
+  sensorMin,
+  sensorMax,
+  window = 10,
+  prec = 1e-04,
+  diag = FALSE
+)
 }
 \arguments{
-\item{df}{A data frame containing the time series water quality or quantity data.}
+\item{df}{A data frame containing time series data. It must have a timestamp column of class `POSIXct` and a numeric value column (assumed to be the second column).}
 
-\item{overwrite}{A vector of quality codes that CAN be overwritten by the function.}
+\item{overwrite}{A vector of quality codes that CAN be overwritten by this function (e.g., manually applied flags that can be updated).}
 
-\item{sensorMin}{The minimum value as reportable from the sensor for the given data.}
+\item{sensorMin}{Minimum valid value as reportable from the sensor.}
 
-\item{sensorMax}{The maximum value as reportable from the sensor for the given data.}
+\item{sensorMax}{Maximum valid value as reportable from the sensor.}
 
-\item{window}{The number of hours the average data logging interval is used to calculate the rolling window for flatline detection. For example if the average read time is hourly, flatln = 3 means consecutive values across a 3 hour interval will flag.}
+\item{window}{Approximate number of hours to define a rolling window size for flatline and spike detection.}
 
-\item{prec}{The precision of the sensor OR how much variation is acceptable to determine a repeating value}
+\item{prec}{The precision threshold to detect repeated values (flatlines). Values within `prec` across the window are considered repeating.}
+
+\item{diag}{Logical; if `TRUE`, diagnostic columns used in detection (e.g., rolling SD and median) will be appended to the output.}
 }
 \value{
-A data frame with the original data and a new column called Quality that indicates the type of anomaly, if any.
+A data frame with the original data and an updated or newly created "Quality" column with anomaly classifications: 'impossible', 'below_limits', 'above_limits', 'repeating_value', 'spike', or 'OK'.
 }
 \description{
-This function detects anomalies in time series data by looking for values that are
-outside of the expected range, or that are repeated values. The function can also
-detect spikes in the data.
+This function identifies anomalies in time series data based on:
+- Values outside expected physical sensor bounds (`sensorMin`/`sensorMax`)
+- Impossible values (e.g., negative values for non-negative sensors)
+- Repeated or flatlined values using a rolling standard deviation
+- Spikes using deviation from rolling median
+}
+\details{
+Anomalies are flagged in a "Quality" column (or similarly named column based on what's present in the data).
+}
+\note{
+The input data frame (`df`) must include the following columns:
+
+| Column Name | Type      | Description                                               |
+|-------------|-----------|-----------------------------------------------------------|
+| `ts`        | POSIXct   | Timestamp of each observation                             |
+| `Value`     | numeric   | Measured value from the sensor                            |
+| `Quality`   | character | Existing quality flag for the observation (optional)      |
+
+All other columns in the input data frame will be preserved in the output.
+If `diag = TRUE`, additional diagnostic columns (e.g., rolling SD, median) will be appended.
 }
 \examples{
+library(dplyr)
+library(zoo)
+library(plotly)
 
+#example Total Suspended Solids dataframe
 df <- waterQUAC::TSS_data
 
-manual_codes = c(1:4000)
-sensorMin = 0
-sensorMax = 650
+# Apply anomaly detection
+flagged <- ts_anom(df = df,
+                   overwrite = 1:4000,
+                   sensorMin = 0,
+                   sensorMax = 10)
 
-tst <- ts_anom(df = df,
-              overwrite = manual_codes,
-              sensorMin = 0,
-              sensorMax = 650)
-tst |>
- plotly::plot_ly() |>
- plotly::add_markers(
-   x =  ~ ts,
-   y =  ~ Value,
-   type = "scatter",
-   color = ~ Quality
- )
+# Plot flagged results
+  plotly::plot_ly(data = flagged) |>
+    plotly::add_markers(
+      x = ~ts,
+      y = ~Value,
+      color = ~Quality,
+      marker = list(size = 8)
+    )
 
 }
