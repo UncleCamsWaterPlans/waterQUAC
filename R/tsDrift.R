@@ -10,9 +10,10 @@
 #'
 #' @param data A data frame containing time series data.
 #' @param value_col A string. The name of the column containing numeric sensor values.
-#' @param time_col A string. The name of the column containing POSIXct timestamps.
 #' @param threshold_multiplier A numeric multiplier applied to the median value to define the drift threshold. Default is 2.
 #' @param time_threshold_days Minimum number of **continuous** days above the threshold required to flag sensor drift. Default is 5 days.
+#' @param overwrite A vector of quality codes to overwrite
+#' @param type A string. Either "rising", "falling", or NULL
 #'
 #' @return A data frame with all original columns, a new column `cumulative_time_above_threshold`
 #'         (in days), and an updated or added `Quality` column with `"sensor_drift"` flags.
@@ -28,6 +29,7 @@
 #' All other columns in the input data frame will be preserved in the output.
 #'
 #' @examples
+#' library(dplyr)
 #' # Simulated data
 #' set.seed(42)
 #' ts <- seq.POSIXt(from = as.POSIXct("2024-01-01"), by = "hour", length.out = 200)
@@ -49,14 +51,15 @@
 #' }
 #'
 #' @export
+detect_sensor_drift <- function(data, value_col, threshold_multiplier = 2, time_threshold_days = 5, overwrite = NULL, type = NULL) {
 
-detect_sensor_drift <- function(data, value_col, threshold_multiplier = 2, time_threshold_days = 5, overwrite = NULL) {
+  #if(!is.null(type)) time_threshold_days <- time_threshold_days / 2
+
   # Find the column name that is of class "posixct"
-  time_col <- names(df)[sapply(df, function(x) any(class(x) == "POSIXct"))]
+  time_col <- names(data)[sapply(data, function(x) any(class(x) == "POSIXct"))]
 
   # Ensure the data is sorted by time
   data <- data[order(data[[time_col]]), ]
-
 
 
   # Calculate the threshold based on the multiplier
@@ -65,21 +68,8 @@ detect_sensor_drift <- function(data, value_col, threshold_multiplier = 2, time_
   # Calculate time difference in seconds
   data$time_diff <- c(NA, diff(as.numeric(as.POSIXct(data[[time_col]]))))
 
-  # Compute cumulative time above threshold (in days)
-  cumulative_time <- 0
-  cumulative_times <- numeric(nrow(data))
-
-  for (i in seq_len(nrow(data))) {
-    if (!is.na(data[[value_col]][i]) && data[[value_col]][i] > threshold) {
-      cumulative_time <- cumulative_time + ifelse(!is.na(data$time_diff[i]), data$time_diff[i], 0)
-    } else {
-      cumulative_time <- 0
-    }
-    cumulative_times[i] <- cumulative_time / 86400  # convert to days
-  }
-
   # Store cumulative time in the data
-  data$cumulative_time_above_threshold <- cumulative_times
+  data$cumulative_time_above_threshold <- daysAboveThreshold(data, threshold, type)
 
   # Detect or create quality column
   pattern <- "(?i)quality"
@@ -91,11 +81,16 @@ detect_sensor_drift <- function(data, value_col, threshold_multiplier = 2, time_
   }
 
   # Flag sensor drift conditionally, using overwrite logic
-  should_flag <- data$cumulative_time_above_threshold > time_threshold_days
-  can_overwrite <- is.na(data[[quality_col]]) |
-    (!is.null(overwrite) & data[[quality_col]] %in% overwrite)
 
-  data[[quality_col]][should_flag & can_overwrite] <- "sensor_drift"
+  #data
+  #data$Quality[4] <- NA
+  data <- data %>%
+    mutate(flag = ifelse(cumulative_time_above_threshold > (time_threshold_days), TRUE, FALSE )) %>%
+    mutate(overwrite = ifelse( is.na(.[[quality_col]]) | is.null(overwrite) | is.null(.[[quality_col]]) | .[[quality_col]] %in% overwrite, TRUE, FALSE )) %>%
+    mutate(!!quality_col := ifelse(flag & overwrite, "sensor_drift", .[[quality_col]])) %>%
+    dplyr::select(-c(flag,overwrite))
 
   return(data)
 }
+
+

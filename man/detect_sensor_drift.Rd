@@ -9,7 +9,8 @@ detect_sensor_drift(
   value_col,
   threshold_multiplier = 2,
   time_threshold_days = 5,
-  overwrite = NULL
+  overwrite = NULL,
+  type = NULL
 )
 }
 \arguments{
@@ -21,7 +22,9 @@ detect_sensor_drift(
 
 \item{time_threshold_days}{Minimum number of **continuous** days above the threshold required to flag sensor drift. Default is 5 days.}
 
-\item{time_col}{A string. The name of the column containing POSIXct timestamps.}
+\item{overwrite}{A vector of quality codes to overwrite}
+
+\item{type}{A string. Either "rising", "falling", or NULL}
 }
 \value{
 A data frame with all original columns, a new column `cumulative_time_above_threshold`
@@ -49,6 +52,7 @@ The input data frame (`data`) must include:
 All other columns in the input data frame will be preserved in the output.
 }
 \examples{
+library(dplyr)
 # Simulated data
 set.seed(42)
 ts <- seq.POSIXt(from = as.POSIXct("2024-01-01"), by = "hour", length.out = 200)
